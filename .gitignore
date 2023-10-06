@@ -1,0 +1,22 @@
+# File eksekusi
+*.exe
+
+# Direktori vendor
+/vendor/
+
+# File hasil kompilasi
+*.o
+*.a
+
+# Direktori hasil build
+/bin/
+
+# Direktori dan file konfigurasi editor/ IDE
+.vscode/
+.idea/
+
+# File log
+*.log
+
+# Direktori cache
+__Pycache__/
