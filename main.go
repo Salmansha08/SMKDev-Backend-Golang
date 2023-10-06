@@ -15,31 +15,31 @@ type Student struct {
 	Grade string `json:"grade"`
 }
 
-// Inisiasi Database
+// Inisiasi Database (Simpan di dalam slice)
 var students []Student
 
 func main() {
 	// Inisiasi Echo Framework
 	e := echo.New()
 
-	students = []Student{}
 	// Routing
-	e.GET("/students", getStudents)          // Mengambil semua data
-	e.GET("/students/:id", getStudentsByID)  // Mengambil data berdasarkan ID
-	e.POST("/students", createStudent)       // Menambahkan data
-	e.PUT("/students/:id", updateStudent)    // Mengubah data
-	e.DELETE("/students/:id", deleteStudent) // Menghapus data
+	e.GET("/students", getStudents)          // Mendapatkan semua data siswa
+	e.GET("/students/:id", getStudentByID)   // Mendapatkan data siswa berdasarkan ID
+	e.POST("/students", createStudent)       // Menambahkan data siswa
+	e.PUT("/students/:id", updateStudent)    // Mengubah data siswa berdasarkan ID
+	e.DELETE("/students/:id", deleteStudent) // Menghapus data siswa berdasarkan ID
 
-	e.Logger.Fatal(e.Start(":1323")) // Menjalankan Echo Framework
+	// Menjalankan Echo Framework di port 1323
+	e.Logger.Fatal(e.Start(":1323"))
 }
 
-// Mengambil semua data yang ada dan mengembalikan HTTP Status
+// Mendapatkan semua data siswa dan mengembalikan HTTP Status
 func getStudents(c echo.Context) error {
 	return c.JSON(http.StatusOK, students)
 }
 
-// Mengambil data berdasarkan ID dan mengembalikan HTTP Status
-func getStudentsByID(c echo.Context) error {
+// Mendapatkan data siswa berdasarkan ID dan mengembalikan HTTP Status
+func getStudentByID(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	for _, student := range students {
 		if student.ID == id {
@@ -49,7 +49,7 @@ func getStudentsByID(c echo.Context) error {
 	return c.JSON(http.StatusNotFound, "Student Not Found")
 }
 
-// Menambahkan data dan mengembalikan HTTP Status
+// Menambahkan data siswa dan mengembalikan HTTP Status
 func createStudent(c echo.Context) error {
 	student := new(Student)
 	if err := c.Bind(student); err != nil {
@@ -62,27 +62,26 @@ func createStudent(c echo.Context) error {
 	return c.JSON(http.StatusCreated, student)
 }
 
-// Mengubah data berdasarkan ID dan mengembalikan HTTP Status
+// Mengubah data siswa berdasarkan ID dan mengembalikan HTTP Status
 func updateStudent(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	for i, student := range students {
 		if student.ID == id {
-			// Konversi nilai string ke int
-			age, err := strconv.Atoi(c.FormValue("age"))
-			if err != nil {
-				return c.JSON(http.StatusBadRequest, "Invalid Age")
+			updatedStudent := new(Student)
+			if err := c.Bind(updatedStudent); err != nil {
+				return err
 			}
 
-			students[i].Name = c.FormValue("name")
-			students[i].Age = age // Menggunakan nilai yang telah dikonversi
-			students[i].Grade = c.FormValue("grade")
-			return c.JSON(http.StatusOK, students[i])
+			updatedStudent.ID = student.ID
+			students[i] = *updatedStudent
+
+			return c.JSON(http.StatusOK, updatedStudent)
 		}
 	}
 	return c.JSON(http.StatusNotFound, "Student Not Found")
 }
 
-// Menghapus data berdasarkan ID dan mengembalikan HTTP Status
+// Menghapus data siswa berdasarkan ID dan mengembalikan HTTP Status
 func deleteStudent(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	for i, student := range students {
