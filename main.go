@@ -29,8 +29,7 @@ func main() {
 	e.PUT("/students/:id", updateStudent)    // Mengubah data siswa berdasarkan ID
 	e.DELETE("/students/:id", deleteStudent) // Menghapus data siswa berdasarkan ID
 
-	// Menjalankan Echo Framework di port 1323
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
 // Mendapatkan semua data siswa dan mengembalikan HTTP Status
@@ -72,10 +71,11 @@ func updateStudent(c echo.Context) error {
 				return err
 			}
 
-			updatedStudent.ID = student.ID
-			students[i] = *updatedStudent
+			students[i].Name = updatedStudent.Name
+			students[i].Age = updatedStudent.Age
+			students[i].Grade = updatedStudent.Grade
 
-			return c.JSON(http.StatusOK, updatedStudent)
+			return c.JSON(http.StatusOK, students[i])
 		}
 	}
 	return c.JSON(http.StatusNotFound, "Student Not Found")
@@ -84,10 +84,10 @@ func updateStudent(c echo.Context) error {
 // Menghapus data siswa berdasarkan ID dan mengembalikan HTTP Status
 func deleteStudent(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	for i, student := range students {
-		if student.ID == id {
+	for i := range students {
+		if students[i].ID == id {
 			students = append(students[:i], students[i+1:]...)
-			return c.JSON(http.StatusOK, "Student Deleted")
+			return c.NoContent(http.StatusNoContent)
 		}
 	}
 	return c.JSON(http.StatusNotFound, "Student Not Found")
